@@ -34,7 +34,8 @@ poverty_key_words = ['poverty', 'welfare', 'homelessness', 'inner city', 'minimu
 def index():
 	if request.method == 'POST':
 		search_query = request.form['query']
-		facts_list = search(search_query)
+		election = request.form['election']
+		facts_list = search(search_query, election)
 		name = search_query.title()
 
 		emailMsg = ""
@@ -48,7 +49,7 @@ def index():
 
 		#get pic from wikipedia page
 		session = requests.Session()
-		page = session.get('https://en.wikipedia.org/wiki/' + get_url_extension(name.split(" ")))
+		page = session.get('https://en.wikipedia.org/wiki/' + get_url_extension(name.split(" "), ""))
 
 		tree = BeautifulSoup(page.content, 'lxml')
 		img_link = tree.find_all('img')[3].get('src')
@@ -79,43 +80,42 @@ def summary():
 		message.add_to(recipient)
 		message.set_subject('Your Voteducate Candidate Report')
 		message.set_text(body)
-		message.set_from('Doe John <doe@email.com>')
+		message.set_from('Voteducate')
 		status, msg = sg.send(message)
 		print(status, msg)
 
 	return render_template('sent.html')
 
-def search(search_query):
+def search(search_query, election):
 	name = search_query.split(" ")
 
 	additions = ['views', 'political positions', 'political views' 'political beliefs']
 	urls = []
-	
-	#try:
-	#	for addition in additions:
-	#		temp = search_query + " " + addition
-	#		query = urllib.parse.urlencode({'q': (temp)})
-	#		url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&%s' % query
-	#		search_response = urllib.request.urlopen(url)
-	#		search_results = search_response.read().decode("utf8")
-	#		results = json.loads(search_results)
-	#		data = results['responseData']
-	#		hits = data['results']
-	#		for hit in hits:
-	#			if hit['url'] not in urls:
-	#				urls.append(hit['url'])
 
-	#except:
-
-	urls.append("http://www.ontheissues.org/" + get_url_extension(name) + ".htm")
+	urls.append("http://www.ontheissues.org/" + get_url_extension(name, election) + ".htm")
 
 	for url in urls:
 		print(url + "\n")
 
 	return analyze(urls)
 
-def get_url_extension(name):
+def google_search_results(search_query):
+	temp = search_query + " " + addition
+	query = urllib.parse.urlencode({'q': (temp)})
+	url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&%s' % query
+	search_response = urllib.request.urlopen(url)
+	search_results = search_response.read().decode("utf8")
+	results = json.loads(search_results)
+	data = results['responseData']
+	hits = data['results']
+	for hit in hits:
+		if hit['url'] not in urls:
+			urls.append(hit['url'])
+
+def get_url_extension(name, election):
 	url_extension = ""
+	if election == 'senate':
+		url_extension += "Senate/"
 	for part in name:
 		if part != name[len(name) - 1]:
 			url_extension += part + "_"

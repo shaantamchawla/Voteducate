@@ -25,15 +25,37 @@
     </head>
 
     <body id="page-top">
+        <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand page-scroll" href="/">Voteducate</a>
+                </div>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a class="page-scroll" href="#">About</a></li>
+                        <li><a class="page-scroll"></a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
         <section class="row1" id="services"  style="color: black; background-color: #c8f7c5; display: none">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12 text-center">
                         <br><br>
-                        <h1 style="font-weight: bold; font-size: 400%">Candidate Summary: {{ name }}</h1>
+                        <h1 style="font-weight: bold; padding-top: 50px; font-size: 400%">Candidate Summary: {{ name }}</h1>
                         <br>
                         <div>
-                            <button id="locToggler" style="margin-bottom: 10px" class="btn btn-lg text-center">Email Report</button>
+                            <button id="locToggler" style="margin-bottom: 10px" class="btn btn-lg text-center">Want a Copy of this Report?</button>
                         </div>
                         
                         <form method="POST" action="/summary">
