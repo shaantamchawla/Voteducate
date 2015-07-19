@@ -11,11 +11,11 @@ body {
 }
 
 body {
-    font-family: Merriweather,'Helvetica Neue',Arial,sans-serif;
+    font-family: 'Open Sans','Helvetica Neue',Arial,sans-serif;
 }
 
 hr {
-    max-width: 50px;
+    width: 80%;
     border-color: #f05f40;
     border-width: 3px;
 }
@@ -65,7 +65,7 @@ p {
 }
 
 section {
-    padding: 100px 0;
+    padding: 25px 0;
 }
 
 aside {
@@ -490,4 +490,33 @@ nav {
 
 li {
     text-align: left;
+}
+
+.site-description {
+    font-size: 300%;
+    font-weight: bold;
+    color: black;
+}
+
+section, body {
+    padding-top: 0;
+    margin-top: 0;
+}
+
+::-webkit-input-placeholder { font-style:italic;  }
+::-moz-placeholder { font-style:italic;  } /* firefox 19+ */
+:-ms-input-placeholder { font-style:italic;  } /* ie */
+input:-moz-placeholder { font-style:italic;  }
+
+section {
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+.row1 {
+    padding-top: 0;
+}
+
+input {
+    margin: 0 auto;
 }

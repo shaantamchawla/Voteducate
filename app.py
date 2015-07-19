@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from bs4 import BeautifulSoup, SoupStrainer
 import urllib.request, urllib.parse
 import requests
+import sendgrid
 import lxml
 import json
 
@@ -36,13 +37,53 @@ def index():
 		facts_list = search(search_query)
 		name = search_query.title()
 
-		return render_template('summary.html', facts=facts_list, name=name)
+		emailMsg = ""
 
+		for category in facts_list:
+			for fact in category:
+				emailMsg += fact[4:] + "\n"
+			emailMsg += "\n"
+
+		print(emailMsg)
+
+		#get pic from wikipedia page
+		session = requests.Session()
+		page = session.get('https://en.wikipedia.org/wiki/' + get_url_extension(name.split(" ")))
+
+		tree = BeautifulSoup(page.content, 'lxml')
+		img_link = tree.find_all('img')[3].get('src')
+
+		return render_template('summary.html', facts=facts_list, name=name, img_link=img_link, emailMsg=emailMsg)
 	return render_template('index.html')
 
 @app.route('/about')
 def about():
 	return render_template('about.html')
+
+@app.route('/summary', methods=['GET', 'POST'])
+def summary():
+	if request.method == 'POST':
+		recipient = request.form['recipient']
+		print(recipient)
+		origBody = request.form['emailMsg']
+		body = ""
+		for i in range(len(origBody) - 3):
+			if origBody[i] != '[' and origBody[i] != ']' and origBody[i] != "\\" and origBody[i] != ",":
+				body += origBody[i]
+				if origBody[i] == "\'" and origBody[i + 1] != "s":
+					body += "\n"
+
+
+		sg = sendgrid.SendGridClient('shaantamc', 'Coolab9')
+		message = sendgrid.Mail()
+		message.add_to(recipient)
+		message.set_subject('Your Voteducate Candidate Report')
+		message.set_text(body)
+		message.set_from('Doe John <doe@email.com>')
+		status, msg = sg.send(message)
+		print(status, msg)
+
+	return render_template('sent.html')
 
 def search(search_query):
 	name = search_query.split(" ")
@@ -66,18 +107,21 @@ def search(search_query):
 
 	#except:
 
-	url_extension = ""
-	for part in name:
-		if part != name[len(name) - 1]:
-			url_extension += part + "_"
-	url_extension += name[len(name) - 1] + ".htm"
-
-	urls.append("http://www.ontheissues.org/" + url_extension)
+	urls.append("http://www.ontheissues.org/" + get_url_extension(name) + ".htm")
 
 	for url in urls:
 		print(url + "\n")
 
 	return analyze(urls)
+
+def get_url_extension(name):
+	url_extension = ""
+	for part in name:
+		if part != name[len(name) - 1]:
+			url_extension += part + "_"
+	url_extension += name[len(name) - 1]
+
+	return url_extension
 
 def analyze(urls):
 	economic_facts = []

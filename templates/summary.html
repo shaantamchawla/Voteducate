@@ -25,20 +25,37 @@
     </head>
 
     <body id="page-top">
-        <section id="services">
-            <<div class="container">
+        <section class="row1" id="services"  style="color: black; background-color: #c8f7c5; display: none">
+            <div class="container">
                 <div class="row">
                     <div class="col-lg-12 text-center">
-                        <h2 class="section-heading">Candidate Summary of {{ name }}</h2>
+                        <br><br>
+                        <h1 style="font-weight: bold; font-size: 400%">Candidate Summary: {{ name }}</h1>
+                        <br>
+                        <div>
+                            <button id="locToggler" style="margin-bottom: 10px" class="btn btn-lg text-center">Email Report</button>
+                        </div>
+                        
+                        <form method="POST" action="/summary">
+                            <div id="toggleInfo" style="display: none">
+                                <input style="width: 30%" type="email" name="recipient" class="text-center form-control change-loc" placeholder="Enter email address">
+                                <input type="hidden" name="emailMsg" value="{{ facts }}">
+                                <br>
+                                <button name="submit" id="sendEmail" class="btn btn-lg btn-warning" style="background-color: #ef4836" type="submit">Submit</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
+        </section>
             
+        <section class="row2" id="services" style="color: black; background-color: #ecf0f1; display: none">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-4 col-md-6 text-center">
                         <div class="service-box">
-                            <h3>{{ name }}'s View on Economic Policy</h3>
+                            <h3>{{ name }}'s Views on Economic Policy</h3>
+                            <hr style="width: 80%; border-top: 1.5px solid black">
                             <ul>
                                 {% for fact in facts[0] %}
                                 <li>{{ fact }}</li>
@@ -49,31 +66,14 @@
                     
                     <div class="col-lg-4 col-md-6 text-center">
                         <div class="service-box">
-                            <h3>{{ name }}'s View on Healthcare</h3>
-                            <ul>
-                                {% for fact in facts[1] %}
-                                <li>{{ fact }}</li>
-                                {% endfor %}
-                            </ul>
+                            <img class="center-block img-responsive img-rounded" src="{{ img_link }}">
                         </div>
                     </div>
                     
                     <div class="col-lg-4 col-md-6 text-center">
                         <div class="service-box">
-                            <h3>{{ name }}'s View on Energy</h3>
-                            <ul>
-                                {% for fact in facts[2] %}
-                                <li>{{ fact }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-lg-4 col-md-6 text-center">
-                        <div class="service-box">
-                            <h3>{{ name }}'s View on Education</h3>
+                            <h3>{{ name }}'s Views on Education</h3>
+                            <hr style="width: 80%; border-top: 1.5px solid black">
                             <ul>
                                 {% for fact in facts[3] %}
                                 <li>{{ fact }}</li>
@@ -81,10 +81,29 @@
                             </ul>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
+    
+        <section class="row3" id="services" style="color: white; background-color: #2c3e50; display: none; padding-bottom: 30px">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 text-center">
+                        <div class="service-box">
+                            <h3>{{ name }}'s Views on Energy</h3>
+                            <hr style="width: 80%; border-top: 1.5px solid white">
+                            <ul>
+                                {% for fact in facts[2] %}
+                                <li>{{ fact }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
                     
                     <div class="col-lg-4 col-md-6 text-center">
                         <div class="service-box">
-                            <h3>{{ name }}'s View on Crime</h3>
+                            <h3>{{ name }}'s Views on Crime</h3>
+                            <hr style="width: 80%; border-top: 1.5px solid white">
                             <ul>
                                 {% for fact in facts[4] %}
                                 <li>{{ fact }}</li>
@@ -95,7 +114,8 @@
                     
                     <div class="col-lg-4 col-md-6 text-center">
                         <div class="service-box">
-                            <h3>{{ name }}'s View on Civil Rights</h3>
+                            <h3>{{ name }}'s Views on Civil Rights</h3>
+                            <hr style="width: 80%; border-top: 1.5px solid white">
                             <ul>
                                 {% for fact in facts[5] %}
                                 <li>{{ fact }}</li>
@@ -104,11 +124,16 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
                 
+        <section class="row4" id="services" style="color: black; background-color: #F5D76E; display: none">
+            <div class="container">
                 <div class="row">
                     <div class="col-lg-4 col-md-6 text-center">
                         <div class="service-box">
                             <h3>{{ name }}'s Views on Family Life</h3>
+                            <hr style="width: 80%; border-top: 1.5px solid black">
                             <ul>
                                 {% for fact in facts[6] %}
                                 <li>{{ fact }}</li>
@@ -120,6 +145,7 @@
                     <div class="col-lg-4 col-md-6 text-center">
                         <div class="service-box">
                             <h3>{{ name }}'s Views on Foreign Policy</h3>
+                            <hr style="width: 80%; border-top: 1.5px solid black">
                             <ul>
                                 {% for fact in facts[7] %}
                                 <li>{{ fact }}</li>
@@ -131,6 +157,7 @@
                     <div class="col-lg-4 col-md-6 text-center">
                         <div class="service-box">
                             <h3>{{ name }}'s Views on Gun Control</h3>
+                            <hr style="width: 80%; border-top: 1.5px solid black">
                             <ul>
                                 {% for fact in facts[8] %}
                                 <li>{{ fact }}</li>
@@ -139,11 +166,16 @@
                         </div>
                     </div>
                 </div>
-                
+            </div>
+        </section>
+        
+        <section class="row5" id="services" style="color: black; background-color: #f4b350; display: none">
+            <div class="container">
                 <div class="row">
                     <div class="col-lg-4 col-md-6 text-center">
                         <div class="service-box">
                             <h3>{{ name }}'s Views on Security</h3>
+                            <hr style="width: 80%; border-top: 1.5px solid black">
                             <ul>
                                 {% for fact in facts[9] %}
                                 <li>{{ fact }}</li>
@@ -155,6 +187,7 @@
                     <div class="col-lg-4 col-md-6 text-center">
                         <div class="service-box">
                             <h3>{{ name }}'s Views on Immigration</h3>
+                            <hr style="width: 80%; border-top: 1.5px solid black">
                             <ul>
                                 {% for fact in facts[10] %}
                                 <li>{{ fact }}</li>
@@ -166,43 +199,13 @@
                     <div class="col-lg-4 col-md-6 text-center">
                         <div class="service-box">
                             <h3>{{ name }}'s Views on Poverty</h3>
+                            <hr style="width: 80%; border-top: 1.5px solid black">
                             <ul>
                                 {% for fact in facts[11] %}
                                 <li>{{ fact }}</li>
                                 {% endfor %}
                             </ul>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <aside class="bg-dark">
-            <div class="container text-center">
-                <div class="call-to-action">
-                    <h2>Free Download at Start Bootstrap!</h2>
-                    <a href="#" class="btn btn-default btn-xl wow tada">Download Now!</a>
-                </div>
-            </div>
-        </aside>
-
-        <section id="contact">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-8 col-lg-offset-2 text-center">
-                        <h2 class="section-heading">Let's Get In Touch!</h2>
-                        <hr class="primary">
-                        <p>Ready to start your next project with us? That's great! Give us a call or send us an email and we will get back to you as soon as possible!</p>
-                    </div>
-                    
-                    <div class="col-lg-4 col-lg-offset-2 text-center">
-                        <i class="fa fa-phone fa-3x wow bounceIn"></i>
-                        <p>123-456-6789</p>
-                    </div>
-                    
-                    <div class="col-lg-4 text-center">
-                        <i class="fa fa-envelope-o fa-3x wow bounceIn" data-wow-delay=".1s"></i>
-                        <p><a href="mailto:your-email@your-domain.com">feedback@startbootstrap.com</a></p>
                     </div>
                 </div>
             </div>
@@ -221,5 +224,19 @@
 
         <!-- Custom Theme JavaScript -->
         <script src="static/js/custom.js"></script>
+        
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $(".row1").slideDown("1000");
+                $(".row2").slideDown("1000");
+                $(".row3").slideDown("1000");
+                $(".row4").slideDown("1000");
+                $(".row5").slideDown("1000");
+                
+                $("#locToggler").click(function() {
+                        $('#toggleInfo').slideToggle('fast');
+                });
+            });
+        </script>
     </body>
 </html>
