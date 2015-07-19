@@ -10,20 +10,20 @@ app = Flask(__name__)
 #obama search = https://www.google.com/webhp?oe=utf8&source=uds&start=0&h1=en&q=barack+obama
 
 economic_key_words = ['economy', 'economic' 'tax', 'taxes', 'budget', 'debt', 'employment', 'recession', 'financial']
-health_key_words = ['health care', 'obamacare', 'health reform', 'medicare', 'medicaid', 'health insurance', 'pandemic', 'condom', 'aids']
+health_key_words = ['health', 'obamacare', 'health', 'medicare', 'medicaid', 'health insurance', 'pandemic', 'condom', 'aids']
 energy_key_words = ['energy', 'fracking', 'water quality', 'global warming', 'oil', 'nuclear', 'carbon', 'pollution', 'gas', 'coal', 
-					'solar', 'electricity', 'recycling']
+					'solar', 'electricity', 'recycling', 'green energy', 'renewable energy', 'greenhouse gas']
 education_key_words = ['education', 'college', 'student loan', 'high school dropout', 'evolution', 'test score', 'teacher', 'pell']
 crime_key_words = ['prison', 'incarceration' 'execution', 'death penalty', 'death sentence', 'capital punishment', 'drug deal', 'use drug', 
 					'sell drug']
 rights_key_words = ['civil rights', 'gay', 'lesbian', 'racial equality', 'black', 'affirmative action', 'job discrimination',
 					'same-sex marriage', 'homosexuality', 'hate crime', 'racism', 'police brutality', 'police violence']
-family_key_words = ['family', 'family values', 'religion', 'christianity', 'abstinence', 'childcare', 'child support', 'abortion', 
+family_key_words = ['family', 'childhood', 'family values', 'religion', 'christianity', 'abstinence', 'childcare', 'child support', 'abortion', 
 					'sexual abuse']
 foreign_key_words = ['foreign policy', 'terrorism', 'world war', 'iraq', 'afghanistan', 'north korea', 'israel', 'iran', 'qaeda', 'taliban', 'isis',
 					'foreign trade', 'export goods']
 gun_key_words = ['gun control', 'gun rules', 'gun violence', '2nd amendment', 'second amendment', 'gun bans', 'semi-automatic', 
-					'semi automatic']
+					'semi automatic', 'gun background']
 security_key_words = ['homeland security', 'national security', 'nuclear weapons', 'nuclear stockpile', 'terrorist threats', 'privacy',
 						'torture', 'ptsd', 'homeless veteran', 'drone', 'mass destruction']
 immigration_key_words = ['immigration', 'illegal immigrant', 'border patrol', 'path to citizenship', ' legal immigrant', 'foreign student']
@@ -34,8 +34,9 @@ def index():
 	if request.method == 'POST':
 		search_query = request.form['query']
 		facts_list = search(search_query)
+		name = search_query.title()
 
-		return render_template('summary.html', facts=facts_list)
+		return render_template('summary.html', facts=facts_list, name=name)
 
 	return render_template('index.html')
 
@@ -79,6 +80,18 @@ def search(search_query):
 	return analyze(urls)
 
 def analyze(urls):
+	economic_facts = []
+	health_facts = []
+	energy_facts = []
+	education_facts = []
+	crime_facts = []
+	rights_facts = []
+	family_facts = []
+	foreign_facts = []
+	gun_facts = []
+	security_facts = []
+	immigration_facts = []
+	poverty_facts = []
 	facts = []
 
 	for url in urls:
@@ -89,26 +102,261 @@ def analyze(urls):
 		li = SoupStrainer('li')
 		soup = BeautifulSoup(page.content, 'lxml', parse_only=li)
 
-		info = str(soup.getText().encode('utf-8')).split('\\n')
+		info = str(soup.getText().encode('ascii', 'ignore')).split('\\n')
 		fact_count = 0
 
-		for item in info:
-			if fact_count > 20:
+		for line in info:
+			found_flag = False
+			if fact_count > 500:
 				break
 
-			if item != "":
-				for key_word in key_words:
-					if key_word in item:
-						temp = item
-						if temp[-2:] == "\\r":
-							temp = item[:-2]
+			if line != "" and '?' not in line and 'OpEd' not in line:
+				if found_flag == False:
+					for key_word in economic_key_words:
+						if key_word in line:
+							temp = line
+							if temp[-2:] == "\\r":
+								temp = line[:-2]
 
-						if temp[-1:] == ")":
-							temp = temp[:-11]
+							if temp[-1:] == ")":
+								temp = temp[:-11]
 
-						facts.append(temp)
-						fact_count += 1
-						break
+							if "FactCheck" in temp:
+								temp = temp[15:]
+
+							economic_facts.append(temp)
+							found_flag = True
+							fact_count += 1
+
+							#break out of inner loop, go on to next line
+							break
+
+				if found_flag == False:
+					for key_word in health_key_words:
+						if key_word in line:
+							temp = line
+							if temp[-2:] == "\\r":
+								temp = line[:-2]
+
+							if temp[-1:] == ")":
+								temp = temp[:-11]
+
+							if "FactCheck" in temp:
+								temp = temp[15:]
+
+							health_facts.append(temp)
+							found_flag = True
+							fact_count += 1
+
+							#break out of inner loop, go on to next line
+							break
+
+				if found_flag == False:
+					for key_word in energy_key_words:
+						if key_word in line:
+							temp = line
+							if temp[-2:] == "\\r":
+								temp = line[:-2]
+
+							if temp[-1:] == ")":
+								temp = temp[:-11]
+
+							if "FactCheck" in temp:
+								temp = temp[15:]
+
+							energy_facts.append(temp)
+							found_flag = True
+							fact_count += 1
+
+							#break out of inner loop, go on to next line
+							break
+
+				if found_flag == False:
+					for key_word in education_key_words:
+						if key_word in line:
+							temp = line
+							if temp[-2:] == "\\r":
+								temp = line[:-2]
+
+							if temp[-1:] == ")":
+								temp = temp[:-11]
+
+							if "FactCheck" in temp:
+								temp = temp[15:]
+
+							education_facts.append(temp)
+							found_flag = True
+							fact_count += 1
+
+							#break out of inner loop, go on to next line
+							break
+
+				if found_flag == False:
+					for key_word in crime_key_words:
+						if key_word in line:
+							temp = line
+							if temp[-2:] == "\\r":
+								temp = line[:-2]
+
+							if temp[-1:] == ")":
+								temp = temp[:-11]
+
+							if "FactCheck" in temp:
+								temp = temp[15:]
+
+							crime_facts.append(temp)
+							found_flag = True
+							fact_count += 1
+
+							#break out of inner loop, go on to next line
+							break
+
+				if found_flag == False:
+					for key_word in rights_key_words:
+						if key_word in line:
+							temp = line
+							if temp[-2:] == "\\r":
+								temp = line[:-2]
+
+							if temp[-1:] == ")":
+								temp = temp[:-11]
+
+							if "FactCheck" in temp:
+								temp = temp[15:]
+
+							rights_facts.append(temp)
+							found_flag = True
+							fact_count += 1
+
+							#break out of inner loop, go on to next line
+							break
+
+				if found_flag == False:
+					for key_word in family_key_words:
+						if key_word in line:
+							temp = line
+							if temp[-2:] == "\\r":
+								temp = line[:-2]
+
+							if temp[-1:] == ")":
+								temp = temp[:-11]
+
+							if "FactCheck" in temp:
+								temp = temp[15:]
+
+							if "b\'" in temp:
+								temp = temp[2:]
+
+							family_facts.append(temp)
+							found_flag = True
+							fact_count += 1
+
+							#break out of inner loop, go on to next line
+							break
+
+				if found_flag == False:
+					for key_word in foreign_key_words:
+						if key_word in line:
+							temp = line
+							if temp[-2:] == "\\r":
+								temp = line[:-2]
+
+							if temp[-1:] == ")":
+								temp = temp[:-11]
+
+							if "FactCheck" in temp:
+								temp = temp[15:]
+
+							foreign_facts.append(temp)
+							found_flag = True
+							fact_count += 1
+
+							#break out of inner loop, go on to next line
+							break
+
+				if found_flag == False:
+					for key_word in gun_key_words:
+						if key_word in line:
+							temp = line
+							if temp[-2:] == "\\r":
+								temp = line[:-2]
+
+							if temp[-1:] == ")":
+								temp = temp[:-11]
+
+							if "FactCheck" in temp:
+								temp = temp[15:]
+
+							gun_facts.append(temp)
+							found_flag = True
+							fact_count += 1
+
+							#break out of inner loop, go on to next line
+							break
+
+				if found_flag == False:
+					for key_word in security_key_words:
+						if key_word in line:
+							temp = line
+							if temp[-2:] == "\\r":
+								temp = line[:-2]
+
+							if temp[-1:] == ")":
+								temp = temp[:-11]
+
+							if "FactCheck" in temp:
+								temp = temp[15:]
+
+							security_facts.append(temp)
+							found_flag = True
+							fact_count += 1
+
+							#break out of inner loop, go on to next line
+							break
+
+				if found_flag == False:
+					for key_word in immigration_key_words:
+						if key_word in line:
+							temp = line
+							if temp[-2:] == "\\r":
+								temp = line[:-2]
+
+							if temp[-1:] == ")":
+								temp = temp[:-11]
+
+							if "FactCheck" in temp:
+								temp = temp[15:]
+
+							immigration_facts.append(temp)
+							found_flag = True
+							fact_count += 1
+
+							#break out of inner loop, go on to next line
+							break
+
+				if found_flag == False:
+					for key_word in poverty_key_words:
+						if key_word in line:
+							temp = line
+							if temp[-2:] == "\\r":
+								temp = line[:-2]
+
+							if temp[-1:] == ")":
+								temp = temp[:-11]
+
+							if "FactCheck" in temp:
+								temp = temp[15:]
+
+							poverty_facts.append(temp)
+							found_flag = True
+							fact_count += 1
+
+							#break out of inner loop, go on to next line
+							break
+
+	facts.extend((economic_facts, health_facts, energy_facts, education_facts, crime_facts, rights_facts, family_facts, foreign_facts, 
+		gun_facts, security_facts, immigration_facts, poverty_facts))
+
 	return facts
 
 if __name__ == '__main__':

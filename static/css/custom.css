@@ -487,3 +487,7 @@ input {
 nav {
     border-bottom: 2px solid;
 }
+
+li {
+    text-align: left;
+}
