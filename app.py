@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, SoupStrainer
 import urllib.request, urllib.parse
+import requests
+import lxml
 import json
 
 app = Flask(__name__)
@@ -12,7 +14,7 @@ key_words = ['tax', 'taxes', 'gay', 'lesbian', 'employment', 'union', 'abortion'
 	'global warning', 'loans', 'student loans', 'welfare', 'social security', 'food stamps', 'disability', 'hate crime', 'police abuse', 
 	'police brutality', 'prison', 'crime', 'execution', 'death penalty', 'death sentence', 'capital punishment', 'gun', 'weapon',
 	'drone', 'combat', 'mass destruction', 'chemical', 'biological', 'science' 'terror', 'war', 'drugs', 'marijuana', 
-	'medical marijuana', 'capitalism', 'economy', 'policy', 'legislation', 'law', 'view', 'opinion', 'security', 'minimum wage', 'god', 
+	'medical marijuana', 'capitalism', 'economy', 'policy', 'legislation', 'law', 'view', 'security', 'minimum wage', 'god', 
 	'evolution', 'israel', 'iraq', 'afghanistan', 'north korea', 'mexico', 'cuba', 'iran', 'pakistan', 'taliban', 'al-qaeda', 'palestine', 
 	'gaza', 'oil', 'shooting', 'environment', 'healthcare', 'pension', 'poverty', 'middle class', 'lower class', 'upper class', 'college',
 	'school', 'transportation', 'fracking', 'water quality', 'foreign', 'isis', 'insurance', 'carbon', 'greenhouse', 'pandemic',
@@ -21,7 +23,10 @@ key_words = ['tax', 'taxes', 'gay', 'lesbian', 'employment', 'union', 'abortion'
 @app.route('/', methods=['GET', 'POST'])
 def index():
 	if request.method == 'POST':
-		query = request.form['query']
+		search_query = request.form['query']
+		facts_list = search(search_query)
+
+		return render_template('summary.html', facts=facts_list)
 
 	return render_template('index.html')
 
@@ -31,54 +36,68 @@ def about():
 
 def search(search_query):
 	name = search_query.split(" ")
-	first_name = name[0]
-
-	if len(name) > 1:
-		last_name = name[len(name) - 1]
 
 	additions = ['views', 'political positions', 'political views' 'political beliefs']
 	urls = []
 	
-	for addition in additions:
-		temp = search_query + " " + addition
-		query = urllib.parse.urlencode({'q': (temp)})
-		url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&%s' % query
-		search_response = urllib.request.urlopen(url)
-		search_results = search_response.read().decode("utf8")
-		results = json.loads(search_results)
-		data = results['responseData']
-		hits = data['results']
-		for hit in hits:
-			if hit['url'] not in urls:
-				urls.append(hit['url'])
+	#try:
+	#	for addition in additions:
+	#		temp = search_query + " " + addition
+	#		query = urllib.parse.urlencode({'q': (temp)})
+	#		url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&%s' % query
+	#		search_response = urllib.request.urlopen(url)
+	#		search_results = search_response.read().decode("utf8")
+	#		results = json.loads(search_results)
+	#		data = results['responseData']
+	#		hits = data['results']
+	#		for hit in hits:
+	#			if hit['url'] not in urls:
+	#				urls.append(hit['url'])
+
+	#except:
+
+	url_extension = ""
+	for part in name:
+		if part != name[len(name) - 1]:
+			url_extension += part + "_"
+	url_extension += name[len(name) - 1] + ".htm"
+
+	urls.append("http://www.ontheissues.org/" + url_extension)
 
 	for url in urls:
 		print(url + "\n")
 
-	analyze(urls)
-
-	#if on_issues_count == 0:
-	#	urls.append("http://www.ontheissues.org/" + first_name + "_" + last_name + ".htm")
+	return analyze(urls)
 
 def analyze(urls):
 	facts = []
 
 	for url in urls:
 		#summarize the content on the page
-		page = urllib.request.urlopen(url).read()
-		soup = BeautifulSoup(page, "html.parser")
-		info = str(soup.getText().encode('UTF-8')).split('\\n')
+		session = requests.Session()
+		page = session.get(url)
+
+		li = SoupStrainer('li')
+		soup = BeautifulSoup(page.content, 'lxml', parse_only=li)
+
+		info = str(soup.getText().encode('utf-8')).split('\\n')
+		fact_count = 0
+
 		for item in info:
+			if fact_count > 20:
+				break
+
 			if item != "":
 				for key_word in key_words:
 					if key_word in item:
-						facts.append(item)
+						temp = item
+						if item[-2:] == "\\r":
+							temp = item[:-2]
+
+						facts.append(temp)
+						fact_count += 1
 						break
-
-		for fact in facts:
-			print(fact)
-
-#analyze(['https://en.wikipedia.org/wiki/Political_positions_of_Barack_Obama'])
+	return facts
 
 if __name__ == '__main__':
 	app.run(debug=True, use_reloader=False)
